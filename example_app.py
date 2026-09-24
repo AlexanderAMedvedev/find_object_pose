@@ -13,7 +13,7 @@ DEBUG_FILEPATH = "find_object_pose_debug.output"
 #
 A_PRIORI_POINTS_FILEPATH = (
     Path(__file__).resolve().parent.parent
-    / "data_find_back_holes/a_priori_objects_points.json"
+    / "data_find_object_pose/a_priori_objects_points.json"
 )
 #
 CONFIG_PATH = (
@@ -24,7 +24,7 @@ MAX_READ_FAILURES = 30
 #
 CAMERA_INTRINSICS_FILEPATH = (
     Path(__file__).resolve().parent.parent
-    / "data_find_back_holes/camera_calibration.json"
+    / "data_find_object_pose/camera_calibration_result.json"
 )
 USE_CANNY_EDGE_DETECTOR = False
 REDUCE_NOISE = True
