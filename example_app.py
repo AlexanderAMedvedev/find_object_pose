@@ -11,6 +11,9 @@ from find_object_pose import draw_pose
 DEBUG = True
 DEBUG_FILEPATH = "find_object_pose_debug.output"
 #
+FINAL_UNIT_OF_MEASUREMENT='m'
+AXIS_LENGTH_ON_FRAME=0.06 # depends on the final unit of measurement 
+#
 A_PRIORI_POINTS_FILEPATH = (
     Path(__file__).resolve().parent.parent
     / "data_find_object_pose/a_priori_objects_points.json"
@@ -28,12 +31,10 @@ CAMERA_INTRINSICS_FILEPATH = (
 )
 USE_CANNY_EDGE_DETECTOR = False
 REDUCE_NOISE = True
-BINARIZE_THRESHOLD = 48
+BINARIZE_THRESHOLD = 32
 MIN_AREA_PIXELS = 750
 MIN_SOLIDITY = 0.95
 MAX_SOLIDITY = 0.995
-#
-AXIS_LENGTH=0.06 # depends on the dimension of the apriori points
 
 
 def main() -> None:
@@ -130,7 +131,8 @@ def main() -> None:
                 rotation_vector,
                 camera_matrix,
                 dist_coeffs,
-                axis_length=AXIS_LENGTH
+                axis_length=AXIS_LENGTH_ON_FRAME,
+                uom=FINAL_UNIT_OF_MEASUREMENT,
             )
             # 7 write the obtained 6 parameters to move from the object's coordinate system to camera's coordinate system
             if DEBUG:
