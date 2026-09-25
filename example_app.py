@@ -11,8 +11,8 @@ from find_object_pose import draw_pose
 DEBUG = True
 DEBUG_FILEPATH = "find_object_pose_debug.output"
 #
-FINAL_UNIT_OF_MEASUREMENT='m'
-AXIS_LENGTH_ON_FRAME=0.06 # depends on the final unit of measurement 
+FINAL_UNIT_OF_MEASUREMENT = "m"
+AXIS_LENGTH_ON_FRAME = 0.06  # depends on the final unit of measurement
 #
 A_PRIORI_POINTS_FILEPATH = (
     Path(__file__).resolve().parent.parent
@@ -35,6 +35,7 @@ BINARIZE_THRESHOLD = 32
 MIN_AREA_PIXELS = 750
 MIN_SOLIDITY = 0.95
 MAX_SOLIDITY = 0.995
+MIN_CENTER_Y_UPPER_BY_LOWER_HOLE_RATIO=0.9
 
 
 def main() -> None:
@@ -102,6 +103,7 @@ def main() -> None:
                 min_area_pixels=MIN_AREA_PIXELS,
                 min_solidity=MIN_SOLIDITY,
                 max_solidity=MAX_SOLIDITY,
+                min_center_y_upper_by_lower_hole_ratio=MIN_CENTER_Y_UPPER_BY_LOWER_HOLE_RATIO,
             )
         )
         display = find_n_points.draw_result(

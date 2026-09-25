@@ -1,3 +1,6 @@
+# [0.2.0]
+* extended API by ratio parameter
+
 # [0.1.0]
 * made example app (TO BE tested from E-2-E)
 * made draw_pose subroutine

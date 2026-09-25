@@ -1,13 +1,13 @@
 [project]
 name = "find_object_pose"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 requires-python = ">=3.11"
 dependencies = [
     "opencv-python",
     "get_a_priori_objects_points @ git+https://github.com/AlexanderAMedvedev/get_a_priori_objects_points.git@0.4.1",
     "cv_shared @ git+https://github.com/AlexanderAMedvedev/cv_shared@0.4.1",
-    "find_n_points @ git+https://github.com/AlexanderAMedvedev/find_n_points.git@0.3.1",
+    "find_n_points @ git+https://github.com/AlexanderAMedvedev/find_n_points.git@0.4.0",
     "get_camera_intrinsics @ git+https://github.com/AlexanderAMedvedev/get_camera_intrinsics.git@0.2.0"
 ]
 
