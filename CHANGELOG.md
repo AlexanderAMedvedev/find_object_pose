@@ -1,3 +1,6 @@
+# [0.3.0]
+* added Euler angels function
+
 # [0.2.0]
 * extended API by ratio parameter
 
