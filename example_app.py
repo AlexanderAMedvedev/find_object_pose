@@ -7,6 +7,7 @@ import numpy as np
 import get_camera_intrinsics
 
 from find_object_pose import draw_pose
+from find_object_pose import calculate_Euler_angels
 
 DEBUG = True
 DEBUG_FILEPATH = "find_object_pose_debug.output"
@@ -31,15 +32,15 @@ CAMERA_INTRINSICS_FILEPATH = (
 )
 USE_CANNY_EDGE_DETECTOR = False
 REDUCE_NOISE = True
-BINARIZE_THRESHOLD = 32
-MIN_AREA_PIXELS = 750
-MIN_SOLIDITY = 0.95
+BINARIZE_THRESHOLD = 40
+MIN_AREA_PIXELS = 400
+MIN_SOLIDITY = 0.9 # for stable detection of holes
 MAX_SOLIDITY = 0.995
 MIN_CENTER_Y_UPPER_BY_LOWER_HOLE_RATIO=0.9
 
 
 def main() -> None:
-    prefix = "main (find_object_pose dependency example app)"
+    prefix = "\tmain (find_object_pose dependency example app)"
     if DEBUG:
         open(DEBUG_FILEPATH, "w").close()
     # 1 find the coordinates of the chosen N points in the chosen object's coordinate system
@@ -47,7 +48,8 @@ def main() -> None:
         A_PRIORI_POINTS_FILEPATH,
         DEBUG,
         debug_filepath=DEBUG_FILEPATH,
-    )  # dtype=np.float32 (set within the dependency for conveniency within the dependency)
+    )  # dtype=np.float32 (set within the dependency for conveniency 
+       #                   of calculations within the dependency)
     # 2 get the source of frames
     cap = cv_shared.open_video_capture(
         cv_shared.load_video_source(CONFIG_PATH, DEFAULT_VIDEO_SOURCE)
@@ -90,9 +92,9 @@ def main() -> None:
         else:
             read_failures = 0
 
-        cv_shared.append_value_to_file(f"{prefix} ---next frame---", DEBUG_FILEPATH)
+        cv_shared.append_value_to_file(f"---next frame---{prefix}---next frame---", DEBUG_FILEPATH)
         # 4 find the coordinates of N points on the matrix frame
-        camera_matrix_coordinates_of_virtual_angles, _, __ = (
+        camera_matrix_coordinates_of_virtual_angles, _, ordered_hulls = (
             find_n_points.find_n_points_pipeline(
                 frame=frame,
                 debug=DEBUG,
@@ -109,7 +111,7 @@ def main() -> None:
         display = find_n_points.draw_result(
             frame,
             None,
-            None,
+            ordered_hulls,
             camera_matrix_coordinates_of_virtual_angles,
         )
         # 5 find the translation vector (3) and rotation angles (3) - 6 parameters total - from the object's
@@ -118,31 +120,37 @@ def main() -> None:
             camera_matrix_coordinates_of_virtual_angles = np.array(
                 camera_matrix_coordinates_of_virtual_angles, dtype=np.float32
             )
-            is_success, rotation_vector, translation_vector = cv2.solvePnP(
+            is_success, rotation_vector, translation_vector, inliers = cv2.solvePnPRansac(
                 object_points_in_objects_coordinate_system,
                 camera_matrix_coordinates_of_virtual_angles,
                 camera_matrix,
                 dist_coeffs,
             )
-            # 6 draw the object's coordinate system
+            # 6 calculate Euler angels
+            Euler_angels=calculate_Euler_angels(rotation_vector)
+            # 7 draw the object's coordinate system
             # and put as text the t_vec and r_vec
             display = draw_pose(
                 display,
                 is_success,
                 translation_vector,
                 rotation_vector,
+                Euler_angels,
                 camera_matrix,
                 dist_coeffs,
                 axis_length=AXIS_LENGTH_ON_FRAME,
-                uom=FINAL_UNIT_OF_MEASUREMENT,
+                distance_uom=FINAL_UNIT_OF_MEASUREMENT,
             )
             # 7 write the obtained 6 parameters to move from the object's coordinate system to camera's coordinate system
             if DEBUG:
                 cv_shared.append_value_to_file(
-                    f"{prefix} \n\
-                    solvePnP status: {is_success}\n\
-                    rotation_vector:\n {rotation_vector}\n\
-                    translation_vector:\n {translation_vector}",
+                    f"""{prefix}
+solvePnP status: {is_success}
+inliers: 
+{inliers}
+rotation_vector:\n {rotation_vector}
+Euler angels:\n {Euler_angels}
+translation_vector:\n {translation_vector}""",
                     DEBUG_FILEPATH,
                 )
 
